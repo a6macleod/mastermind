@@ -8,18 +8,17 @@
 
 # Computer randomly chooses four colors
 class Mastermind
-	attr_accessor :hidden_code
+	include CodeComparison
+
+	attr_accessor :hidden_code, :win_game, :turn_counter
 
 	def initialize
 		@hidden_code = []
+		@win_game = false
+		@turn_counter = 0
 	end
 
-	def computer_hidden_code
-		number_array = (1..6).to_a.shuffle.take(4)
-		populate_hidden_code(number_array)
-	end
-
-	def populate_hidden_code(number_array)
+	def numbers_to_colors(number_array)
 		number_array.each do |x|
 			case
 			when number_array[x] == 1
@@ -35,8 +34,56 @@ class Mastermind
 			when number_array[x] == 6
 				color = "purple"
 			end
+			color_array << color
+		end
+		color_array
+	end
 
-			self.hidden_code << color
+	def display_color_choices
+		puts "Type the number corresponding to the color and 'enter'"
+		puts "1 Green" 
+		puts "2 Blue" 
+		puts "3 Red"
+		puts "4 Yellow"
+		puts "5 Orange"
+		puts "6 Purple"
+	end
+end
+
+class ComputerCodePick < Mastermind
+
+	def initialize
+		computer_number_array = (1..6).to_a.shuffle.take(4)
+		self.hidden_code = numbers_to_colors(computer_number_array)		
+	end
+end
+
+class HumanCodePick < Mastermind
+	attr_accessor :player_color_array
+
+	def initialize
+		@player_color_array
+	end
+
+	def player_number_pick
+		display_color_choices
+		4.times do 
+			color_number = gets.chomp.to_i
+			player_number_array << color_number
+		end
+		player_color_array = current_game.numbers_to_colors(player_number_array)
+	end
+end
+
+module CodeComparison
+
+	def compare_code(code_guess, hidden_code)
+		if code_guess == hidden_code
+			current_game.win_game = true
+		elsif hidden_code.include?(player_guess)
+			matches = hidden_code.select(player_guess)
+			puts "The following colors matched: #{matches}"
+			
 		end
 	end
 end
@@ -49,34 +96,31 @@ puts "Possible colors include: "
 puts "Green, Blue, Red, Yellow, Orange, Purple"
 
 player_guess = []
-turn_counter = 0
-win_game? = false
 
 def start_game
 	current_game = Mastermind.new
-
+	computer_code = ComputerCodePick.new
+	human_code = HumanCodePick.new 
+	play_game
 end
 
 def play_game
-	until turn_counter == 12 || win_game == true
-		
-		player_number_ pick 
+	until current.game.turn_counter == 12 || current.game.win_game == true
+		player_guess = human_code.player_number_pick
+		current_game.compare_code(player_guess, current_game.hidden_code)
+		wine_game? == true ? winner_message : turn_counter += 1
+		turn_counter == 12 ? loser_message : return
+	end
+	puts "GAME OVER"
 end
 
-def player_number_pick
-	puts "Pick your colors: "
-	puts
+def winner_message
+	puts "Congratulations! you matched the hidden code!"
 end
 
-def display_color_choices
-	puts "Type the number corresponding to the color separated by a comma"
-	puts "1 Green" 
-	puts "2 Blue" 
-	puts "3 Red"
-	puts "4 Yellow"
-	puts "5 Orange"
-	puts "6 Purple"
+def loser_message
+	puts "Sorry you lost. Better luck next time!"
 end
 
 
-
+start_game
