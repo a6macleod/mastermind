@@ -80,20 +80,21 @@ module CodeComparison
 	def compare_code(code_guess, hidden_code)
 		if code_guess == hidden_code
 			current_game.win_game = true
-		elsif hidden_code.include?(player_guess)
-			matches = hidden_code.select(player_guess)
-			puts "The following colors matched: #{matches}"
-			
+		elsif hidden_code.include?(code_guess)
+			matched_code = []
+			code_guess.each do |x|
+				if code_guess[x] == hidden_code[x]
+					matched_code << code_guess[x]
+				else
+					matched_code << "x"
+				end
+			end
+			matched_colors_only = hidden_code.select(code_guess)
+			puts "MATCHED COLORS: #{matched_colors_only}"
+			puts "COMPLETE MATCH: #{matched_code}"
 		end
 	end
 end
-
-puts "Mastermind! Deduce the four color code in 12 guesses."
-#puts "Who picks to hidden code? 1 for human; 2 for computer"
-#who_pics = gets.chomp.downcase
-
-puts "Possible colors include: "
-puts "Green, Blue, Red, Yellow, Orange, Purple"
 
 player_guess = []
 
@@ -108,8 +109,9 @@ def play_game
 	until current.game.turn_counter == 12 || current.game.win_game == true
 		player_guess = human_code.player_number_pick
 		current_game.compare_code(player_guess, current_game.hidden_code)
-		wine_game? == true ? winner_message : turn_counter += 1
-		turn_counter == 12 ? loser_message : return
+		#maybe move these two lines to their own end_game method
+		current_game.win_game == true ? winner_message : current_game.turn_counter += 1
+		current_game.turn_counter == 12 ? loser_message : return
 	end
 	puts "GAME OVER"
 end
@@ -122,5 +124,12 @@ def loser_message
 	puts "Sorry you lost. Better luck next time!"
 end
 
+
+puts "Mastermind! Deduce the four color code in 12 guesses."
+#puts "Who picks to hidden code? 1 for human; 2 for computer"
+#who_pics = gets.chomp.downcase
+
+puts "Possible colors include: "
+puts "Green, Blue, Red, Yellow, Orange, Purple"
 
 start_game
