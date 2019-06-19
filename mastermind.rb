@@ -7,7 +7,6 @@
 # 6 colors; Green, Blue, Red, Yellow, Orange, Purple
 
 class Mastermind
-
 	attr_accessor :hidden_code, :win_game, :turn_counter
 
 	def initialize
@@ -18,8 +17,7 @@ class Mastermind
 
 	def computer_code_pick
 		computer_number_array = (1..6).to_a.shuffle.take(4)
-		self.hidden_code = numbers_to_colors(computer_number_array)
-		puts "ComputerCodePickhidden code #{hidden_code}"	
+		numbers_to_colors(computer_number_array)
 	end
 
 	def numbers_to_colors(number_array)
@@ -46,7 +44,7 @@ class Mastermind
 	end
 
 	def display_color_choices
-		puts "Type the number corresponding to the color and 'enter'"
+		puts "Type the number corresponding to the color and 'enter' (4x)"
 		puts "1 - Green" 
 		puts "2 - Blue" 
 		puts "3 - Red"
@@ -56,21 +54,30 @@ class Mastermind
 	end
 
 	def compare_code(code_guess, hidden_code)
-		puts "CodeComparison code_guess #{code_guess}"
-		if code_guess == hidden_code
-			current_game.win_game = true
-		elsif hidden_code.include?(code_guess)
-			matched_code = []
-			code_guess.each do |x|
-				if code_guess[x] == hidden_code[x]
-					matched_code << code_guess[x]
-				else
-					matched_code << "x"
-				end
+		matches = code_guess & hidden_code
+		matched_code = []
+		win_check = 0
+		i = 0
+		4.times do 
+			if code_guess[i] == hidden_code[i]
+				matched_code << code_guess[i]
+				win_check += 1
+			else
+				matched_code << "x"
 			end
-			matched_colors_only = hidden_code.select(code_guess)
-			puts "MATCHED COLORS: #{matched_colors_only}"
-			puts "COMPLETE MATCH: #{matched_code}"
+			i += 1
+		end
+		puts "\n\n\n--------------------------------------------------------------\n\n"
+		puts "MATCHED COLORS: #{matches}"
+		puts "CODE MATCH: #{matched_code}"
+		puts "Guess number #{turn_counter + 1}"
+		puts "\n--------------------------------------------------------------\n\n\n"
+		win?(win_check)
+	end
+
+	def win?(win_check)
+		if win_check == 4
+			self.win_game = true
 		end
 	end
 end
@@ -90,13 +97,10 @@ class HumanCodePick < Mastermind
 			player_number_array << color_number
 		end
 		player_color_array = numbers_to_colors(player_number_array)
-		puts player_color_array
+		p "You picked #{player_color_array.join(", ")}"
 		return player_color_array
 	end
 end
-
-#player_code_guess = []
-#player_choose = []
 
 def start_game
 	current_game = Mastermind.new
@@ -105,31 +109,41 @@ def start_game
 end
 
 def play_game(current_game, human_code)
-	until current_game.turn_counter == 12 || current_game.win_game == true
+	12.times do
 		player_code_guess = human_code.player_number_pick
+		puts "hidden code #{current_game.hidden_code}"
 		current_game.compare_code(player_code_guess, current_game.hidden_code)
 		#maybe move these two lines to their own end_game method
-		current_game.win_game == true ? winner_message : current_game.turn_counter += 1
-		current_game.turn_counter == 12 ? loser_message : return
+		if current_game.win_game == true 
+			winner_message
+			break
+		else
+			 current_game.turn_counter += 1
+		end
+		if current_game.turn_counter == 12 
+			loser_message
+			break
+		else next
+		end
 	end
-	puts "GAME OVER"
+	puts "GAME OVER\n\n\n\n\n\n\n\n\n"
 end
 
 def winner_message
-	puts "Congratulations! you matched the hidden code!"
+	puts "Congratulations! you matched the hidden code!\n"
 end
 
 def loser_message
 	puts "Sorry you lost. Better luck next time!"
 end
 
-puts "\n\n\n--------------------------------------------------------------"
-puts "\nMastermind! Deduce the 4 color code within 12 guesses\n"
+puts "\n\n\n--------------------------------------------------------------\n\n"
+puts "Mastermind! Deduce the 4 color code within 12 guesses to win!\n"
 #puts "Who picks to hidden code? 1 for human; 2 for computer"
 #who_pics = gets.chomp.downcase
 
 puts "\nPossible colors include: \n"
-puts "Green, Blue, Red, Yellow, Orange, Purple\n"
-puts "\n--------------------------------------------------------------\n\n\n"
+puts "Green, Blue, Red, Yellow, Orange, Purple"
+puts "\n\n--------------------------------------------------------------\n\n\n"
 
 start_game
