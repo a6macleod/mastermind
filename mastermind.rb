@@ -44,7 +44,7 @@ class Mastermind
 	end
 
 	def display_color_choices
-		puts "Type the number corresponding to the color and 'enter' (4x)"
+		puts "Type the number (1-6) corresponding to the color and 'enter' (4x)"
 		puts "1 - Green" 
 		puts "2 - Blue" 
 		puts "3 - Red"
@@ -67,11 +67,11 @@ class Mastermind
 			end
 			i += 1
 		end
-		puts "\n\n\n--------------------------------------------------------------\n\n"
+		puts "\n\n--------------------------------------------------------------\n\n"
 		puts "MATCHED COLORS: #{matches}"
 		puts "CODE MATCH: #{matched_code}"
-		puts "Guess number #{turn_counter + 1}"
-		puts "\n--------------------------------------------------------------\n\n\n"
+		puts "Guess number #{turn_counter + 1} of 12"
+		puts "\n--------------------------------------------------------------\n\n"
 		win?(win_check)
 	end
 
@@ -93,8 +93,16 @@ class HumanCodePick < Mastermind
 		display_color_choices
 		player_number_array = []
 		4.times do 
-			color_number = gets.chomp.to_i
-			player_number_array << color_number
+			#color_number = gets.chomp.to_i
+			#player_number_array << color_number
+
+			input = gets.chomp.to_i
+			if (1..6).include?(input) && player_number_array.include?(input) == false
+				player_number_array << input
+			else
+				puts "please enter one number and 'enter'"
+				redo
+			end
 		end
 		player_color_array = numbers_to_colors(player_number_array)
 		p "You picked #{player_color_array.join(", ")}"
@@ -126,7 +134,7 @@ def play_game(current_game, human_code)
 		else next
 		end
 	end
-	puts "GAME OVER\n\n\n\n\n\n\n\n\n"
+	puts "\n\t~GAME OVER~\n\n\n\n\n\n\n\n\n"
 end
 
 def winner_message
@@ -137,13 +145,16 @@ def loser_message
 	puts "Sorry you lost. Better luck next time!"
 end
 
-puts "\n\n\n--------------------------------------------------------------\n\n"
+puts "\n\n\n--------------------------------------------------------------"
+puts "--------------------------------------------------------------\n\n"
+
 puts "Mastermind! Deduce the 4 color code within 12 guesses to win!\n"
 #puts "Who picks to hidden code? 1 for human; 2 for computer"
 #who_pics = gets.chomp.downcase
 
 puts "\nPossible colors include: \n"
 puts "Green, Blue, Red, Yellow, Orange, Purple"
-puts "\n\n--------------------------------------------------------------\n\n\n"
+puts "\n--------------------------------------------------------------"
+puts "--------------------------------------------------------------\n\n\n"
 
 start_game
