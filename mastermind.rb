@@ -7,28 +7,27 @@
 # 6 colors; Green, Blue, Red, Yellow, Orange, Purple
 
 class Mastermind
-	extend	ColorArray
-
-	attr_accessor :hidden_code, :win_game, :turn_counter
+	attr_accessor :hidden_code, :win_game, :turn_counter, :human_picks_secret_code
 
 	def initialize
-		@hidden_code = hidden_code_pick
+		@hidden_code = []
 		@win_game = false
 		@turn_counter = 0
 		@human_picks_secret_code = false
 	end
 
 	def who_picks(computer_or_human)
-		if computer_or_human[1] == "y"
-			self.human_picks_secret_code = true
+		if computer_or_human[0] == "y"
+			self.human_picks_secret_code = true		
 		end
 	end
 
-	def hidden_code_pick(human_picks_secret_code)
+	def hidden_code_pick
 		if human_picks_secret_code == false
 			self.hidden_code = computer_code_pick
 		else
 			self.hidden_code = player_number_pick
+		end
 	end
 
 	def computer_code_pick
@@ -63,37 +62,6 @@ class Mastermind
 			self.win_game = true
 		end
 	end
-end
-
-class HumanCodePick < Mastermind
-	extend ColorArray
-
-	attr_accessor :player_color_array
-
-	def initialize
-		@player_color_array
-	end
-
-	def player_number_pick
-		display_color_choices
-		number_array = []
-		4.times do
-			input = gets.chomp.to_i
-			if (1..6).include?(input) && number_array.include?(input) == false
-				number_array << input
-			else
-				puts "please enter one number and 'enter'"
-				redo
-			end
-		end
-		player_color_array = numbers_to_colors(player_number_array)
-		p "You picked #{player_color_array.join(", ")}"
-		return player_color_array
-	end
-
-end
-
-module ColorArray
 
 	def display_color_choices
 		puts "Type the number (1-6) corresponding to the color and 'enter' (4x)"
@@ -128,26 +96,52 @@ module ColorArray
 	end
 end
 
+class HumanCodePick < Mastermind
+	attr_accessor :player_color_array
+
+	def initialize
+		@player_color_array
+	end
+
+	def player_number_pick
+		display_color_choices
+		number_array = []
+		4.times do
+			input = gets.chomp.to_i
+			if (1..6).include?(input) && number_array.include?(input) == false
+				number_array << input
+			else
+				puts "please enter one number and 'enter'"
+				redo
+			end
+		end
+		player_color_array = numbers_to_colors(number_array)
+		p "You picked #{player_color_array.join(", ")}"
+		return player_color_array
+	end
+
+end
+
 def start_game
 	human_code = HumanCodePick.new
 	current_game = Mastermind.new
 	puts "Do you want to pick the secret code? (y/n)"
 	computer_or_human = gets.chomp.downcase
-	who_picks(current_game.computer_or_human)
-	assign_guesser
+	current_game.who_picks(computer_or_human)
+	play_game(current_game, human_code)
 end
 
-def assign_guesser
+def guess_picks(current_game, human_code)
 	if current_game.human_picks_secret_code == true
-		code_guess = human_code.player_number_pick # player picks secret code
+		return human_code.player_number_pick # player picks secret code
 	 else
-	 	code_guess = current_game.computer_code_pick # computer picks secret code
+	 	return current_game.computer_code_pick # computer picks secret code
 	 end 
-	play_game(current_game, code_guess)
 end
 
-def play_game(current_game, code_guess)
+def play_game(current_game, human_code)
 	12.times do
+		code_guess = guess_picks(current_game, human_code)
 		puts "hidden code #{current_game.hidden_code}"
 		current_game.compare_code(code_guess, current_game.hidden_code)
 		puts "press enter to continue"
