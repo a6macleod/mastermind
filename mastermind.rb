@@ -115,12 +115,17 @@ class Mastermind
 		if human_picks_secret_code == false
 			puts "MATCHED COLORS #{(matched_colors - matched_secret_code)}"
 		end
-		puts "1 - Green" 
-		puts "2 - Blue" 
-		puts "3 - Red"
-		puts "4 - Yellow"
-		puts "5 - Orange"
-		puts "6 - Purple\n\n"
+		#possible_colors.each_with_index.map { |x,i| puts "#{i+1} - #{x}" }
+		possible_colors.each_with_index do |x, i| 
+			if matched_secret_code.include?(x) 
+				next
+			elsif matched_colors.include?(x)
+				puts "#{i+1} - #{x}"
+			else
+				puts "\t#{i+1} - #{x}"
+			end
+		end
+		puts #blank line
 	end
 
 	def numbers_to_colors(x)
